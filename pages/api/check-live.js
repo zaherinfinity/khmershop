@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     try {
       const resp = await axios.head(url, { timeout: 5000 });
       if (resp.status < 400) live.push(url);
-    } catch (e) { /* ignore */ }
+    } catch (e) {}
   }
   res.status(200).json({ live });
 }
