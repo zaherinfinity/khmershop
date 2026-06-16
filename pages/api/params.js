@@ -14,27 +14,22 @@ export default async function handler(req, res) {
     const $ = cheerio.load(response.data);
     const params = [];
 
-    // 1. From the current URL query string
+    // From current URL
     const parsed = new URL(url);
-    parsed.searchParams.forEach((value, name) => {
-      params.push({ name, value });
-    });
+    parsed.searchParams.forEach((value, name) => params.push({ name, value }));
 
-    // 2. From all links on the page
+    // From all links
     $('a[href]').each((_, el) => {
       const href = $(el).attr('href');
       if (!href) return;
       try {
         const linkUrl = new URL(href, url);
-        linkUrl.searchParams.forEach((value, name) => {
-          params.push({ name, value });
-        });
-      } catch (e) { /* ignore invalid URLs */ }
+        linkUrl.searchParams.forEach((value, name) => params.push({ name, value }));
+      } catch (e) {}
     });
 
-    // 3. From forms (GET method)
+    // From GET forms
     $('form[method="get"]').each((_, form) => {
-      const action = $(form).attr('action') || '';
       $(form).find('input[name]').each((_, input) => {
         const name = $(input).attr('name');
         const value = $(input).attr('value') || '';
@@ -42,7 +37,7 @@ export default async function handler(req, res) {
       });
     });
 
-    // Remove duplicates by (name,value) and limit
+    // Deduplicate
     const unique = [];
     const seen = new Set();
     for (const p of params) {
