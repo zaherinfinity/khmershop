@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}KhmerShop{% endblock %}</title>
+  <style>
+    :root {
+      --navy:   #1a2540;
+      --gold:   #f0a500;
+      --gold-d: #c98a00;
+      --bg:     #f5f3ef;
+      --card:   #ffffff;
+      --text:   #1e1e1e;
+      --muted:  #6b6b6b;
+      --border: #e0dbd0;
+      --red:    #d94f4f;
+      --green:  #2e9e68;
+      --radius: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { color: var(--navy); text-decoration: none; }
+    a:hover { color: var(--gold-d); }
+
+    /* NAV */
+    nav { background: var(--navy); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    .nav-brand { color: var(--gold); font-size: 1.25rem; font-weight: 700; letter-spacing: .5px; }
+    .nav-brand span { color: #fff; font-weight: 400; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a { color: #cdd4e0; font-size: .9rem; padding: 6px 12px; border-radius: 6px; transition: background .15s; }
+    .nav-links a:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .nav-links .btn-nav { background: var(--gold); color: var(--navy) !important; font-weight: 600; }
+    .nav-links .btn-nav:hover { background: var(--gold-d); }
+
+    /* FLASH MESSAGES */
+    .flashes { max-width: 900px; margin: 16px auto 0; padding: 0 16px; }
+    .flash { padding: 12px 16px; border-radius: var(--radius); margin-bottom: 8px; font-size: .9rem; }
+    .flash.success { background: #d4edda; color: #155724; border-left: 4px solid var(--green); }
+    .flash.error   { background: #f8d7da; color: #721c24; border-left: 4px solid var(--red); }
+    .flash.info    { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+
+    /* LAYOUT */
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px; }
+    .wide      { max-width: 1100px; margin: 0 auto; padding: 28px 16px; }
+
+    /* CARDS */
+    .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .15s; text-decoration: none; }
+    .btn-primary  { background: var(--gold); color: var(--navy); }
+    .btn-primary:hover  { background: var(--gold-d); color: var(--navy); }
+    .btn-dark     { background: var(--navy); color: #fff; }
+    .btn-dark:hover     { background: #263360; color: #fff; }
+    .btn-outline  { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+    .btn-outline:hover  { background: var(--navy); color: #fff; }
+    .btn-danger   { background: var(--red); color: #fff; }
+    .btn-danger:hover   { background: #b53c3c; color: #fff; }
+    .btn-sm       { padding: 6px 12px; font-size: .8rem; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: .85rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: .95rem; background: #faf9f6;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(240,165,0,.15);
+    }
+    .form-group textarea { min-height: 90px; resize: vertical; }
+    .form-hint { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+    /* STATUS BADGE */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 700; text-transform: uppercase; }
+    .badge-pending  { background: #fff3cd; color: #856404; }
+    .badge-paid     { background: #d4edda; color: #155724; }
+    .badge-shipped  { background: #cce5ff; color: #004085; }
+    .badge-done     { background: #e2e3e5; color: #383d41; }
+
+    /* PRODUCT GRID */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .product-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow .2s, transform .2s; }
+    .product-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+    .product-card img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
+    .product-card-img-placeholder { width: 100%; height: 180px; background: linear-gradient(135deg, #e8e4dd, #d4cfc5); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+    .product-card-body { padding: 14px; }
+    .product-card-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .product-card-seller { font-size: .78rem; color: var(--muted); margin-bottom: 8px; }
+    .product-card-price { font-size: 1.1rem; font-weight: 800; color: var(--navy); }
+    .product-card-stock { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th { text-align: left; padding: 10px 12px; background: var(--navy); color: #cdd4e0; font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #faf8f4; }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; color: var(--navy); }
+    .page-header p { color: var(--muted); margin-top: 4px; }
+
+    footer { text-align: center; padding: 28px; color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); margin-top: 48px; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="{{ url_for('index') }}">Khmer<span>Shop</span></a>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}">Store</a>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('add_product') }}">+ Add Product</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('register') }}" class="btn-nav">Open Shop</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<footer>KhmerShop · Payments via Bakong KHQR · © 2025</footer>
+</body>
+</html>

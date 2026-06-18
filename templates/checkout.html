@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Checkout — KhmerShop{% endblock %}
+{% block content %}
+<div class="container" style="max-width:560px;">
+  {% if order and qr_image %}
+    <!-- Payment QR screen -->
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; margin-bottom:8px;">🏦</div>
+      <h1 style="font-size:1.5rem; font-weight:800; color:var(--navy); margin-bottom:4px;">Scan to Pay</h1>
+      <p style="color:var(--muted); margin-bottom:24px; font-size:.9rem;">Use ABA, ACLEDA, Wing, or any Bakong-linked app</p>
+
+      <div style="background:#fff; border:2px solid var(--border); border-radius:12px; padding:16px; display:inline-block; margin-bottom:20px;">
+        <img src="{{ qr_image }}" alt="Bakong KHQR" style="width:220px; height:220px;"/>
+      </div>
+
+      <div style="background:#f8f6f2; border-radius:8px; padding:16px; text-align:left; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+          <span style="color:var(--muted); font-size:.88rem;">Product</span>
+          <span style="font-weight:600; font-size:.88rem;">{{ order.product.name }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+          <span style="color:var(--muted); font-size:.88rem;">Buyer</span>
+          <span style="font-weight:600; font-size:.88rem;">{{ order.buyer_name }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border);">
+          <span style="color:var(--muted); font-size:.88rem;">Qty</span>
+          <span style="font-weight:600; font-size:.88rem;">{{ order.quantity }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:8px 0;">
+          <span style="color:var(--navy); font-weight:700;">Total</span>
+          <span style="color:var(--gold-d); font-weight:800; font-size:1.1rem;">${{ "%.2f"|format(order.total_usd) }}</span>
+        </div>
+      </div>
+
+      <p style="font-size:.82rem; color:var(--muted); margin-bottom:20px;">
+        Order #{{ "%06d"|format(order.id) }} · Paying to <strong>{{ order.seller.shop_name }}</strong>
+      </p>
+
+      <form action="{{ url_for('confirm_payment', order_id=order.id) }}" method="POST">
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px;">
+          ✅ I've Paid — Confirm Order
+        </button>
+      </form>
+      <a href="{{ url_for('index') }}" style="display:block; margin-top:12px; font-size:.85rem; color:var(--muted);">Cancel</a>
+    </div>
+
+  {% else %}
+    <!-- Buyer details form -->
+    <div class="card">
+      <div class="page-header">
+        <h1>Checkout</h1>
+        <p>{{ product.name }} — <strong>${{ "%.2f"|format(product.price_usd) }}</strong></p>
+      </div>
+
+      <form method="POST">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" name="buyer_name" placeholder="Sokha Chea" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="buyer_phone" placeholder="012 345 678"/>
+          <div class="form-hint">So the seller can contact you about your order.</div>
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" required/>
+          <div class="form-hint">{{ product.stock }} available</div>
+        </div>
+
+        <div style="background:#f0f4ff; border-radius:8px; padding:14px; margin-bottom:20px; font-size:.88rem; color:#444;">
+          💳 You'll receive a <strong>Bakong KHQR code</strong> to scan with your banking app.
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px;">
+          Generate Payment QR →
+        </button>
+      </form>
+      <a href="{{ url_for('product_detail', product_id=product.id) }}" style="display:block; margin-top:12px; font-size:.85rem; color:var(--muted); text-align:center;">← Back</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

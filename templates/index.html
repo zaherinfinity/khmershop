@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}KhmerShop — Browse Products{% endblock %}
+{% block content %}
+<div class="wide">
+  <div class="page-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h1>🛍️ All Products</h1>
+      <p>{{ products|length }} item{% if products|length != 1 %}s{% endif %} available</p>
+    </div>
+    {% if not current_user.is_authenticated %}
+    <a href="{{ url_for('register') }}" class="btn btn-primary">Open Your Shop →</a>
+    {% endif %}
+  </div>
+
+  {% if products %}
+  <div class="product-grid">
+    {% for p in products %}
+    <a href="{{ url_for('product_detail', product_id=p.id) }}" style="color:inherit;">
+      <div class="product-card">
+        {% if p.image_url %}
+          <img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy"/>
+        {% else %}
+          <div class="product-card-img-placeholder">🛒</div>
+        {% endif %}
+        <div class="product-card-body">
+          <div class="product-card-name">{{ p.name }}</div>
+          <div class="product-card-seller">by {{ p.seller.shop_name }}</div>
+          <div class="product-card-price">${{ "%.2f"|format(p.price_usd) }}</div>
+          <div class="product-card-stock">
+            {% if p.stock > 0 %}✅ {{ p.stock }} in stock{% else %}❌ Out of stock{% endif %}
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card" style="text-align:center; padding:48px;">
+    <div style="font-size:3rem; margin-bottom:12px;">🏪</div>
+    <p style="color:var(--muted); font-size:1.05rem;">No products yet. Be the first to list something!</p>
+    <a href="{{ url_for('register') }}" class="btn btn-primary" style="margin-top:16px;">Open a Shop</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
